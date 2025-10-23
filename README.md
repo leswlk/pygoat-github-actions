@@ -6,8 +6,27 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-intentionally vuln web Application Security in django.
-our roadmap build intentionally vuln web Application in django. The Vulnerability can based on OWASP top ten test
+PyGoat is an intentionally vulnerable web application built with Django, designed to help developers and security professionals explore and understand common vulnerabilities aligned with the OWASP Top 10.
+
+This enhanced version extends the original project by integrating DevSecOps and Secure SDLC practices, demonstrating how automated security testing and cloud deployment can strengthen the software delivery lifecycle.
+
+Key enhancements include:
+
+- Automated CI/CD pipelines with GitHub Actions for build, test, and security scans.
+
+- OWASP ZAP integration for authenticated dynamic testing in CI workflows.
+
+- CodeQL and Semgrep for automated static code analysis.
+
+- Dependabot for dependency scanning and auto-patching.
+
+- OpenSSF Scorecard metrics and dashboards for repository health and security posture tracking.
+
+- Branch protection rules and CODEOWNERS enforcement for secure collaboration.
+
+- AWS deployment via CloudFormation, hosting the intentionally vulnerable app in a controlled environment.
+
+- Configured Security Policy and private vulnerability reporting to model responsible disclosure.
 <br>
 
 Table of Contents
