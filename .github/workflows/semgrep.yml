@@ -36,6 +36,7 @@ jobs:
       # Fetch project source with GitHub Actions Checkout. 
       - uses: actions/checkout@v4
       # Run the "semgrep ci" command on the command line of the docker image.
+      - audit: true
       - run: semgrep ci --sarif > semgrep.sarif
         env:
           # Set the SEMGREP_RULES environment variable to specify which rules Semgrep should use.
