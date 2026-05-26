@@ -1,0 +1,66 @@
+name: "Phase 1: Supply Chain Gates & Governance"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions: read-all
+
+jobs:
+  secret-scan:
+    name: "Gate 1: TruffleHog Secret Verification"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Hardening: Fetches entire history to ensure past commits aren't hiding leaked keys
+
+      - name: "Scan for Leaked Secrets"
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified # Governance: Focuses heavily on actionable, verified exposures
+
+  dependency-audit:
+    name: "Gate 2: Trivy Software Composition Analysis (SCA)"
+    runs-on: ubuntu-latest
+    needs: secret-scan # Order of Operations: Only run if secrets gate passes safely
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Audit Python Dependencies for CVEs"
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1' # Hardening: Force a pipeline failure (exit code 1) if vulnerabilities are found
+          ignore-unfixed: true # Operational Maturity: Focuses engineers strictly on actionable patches
+          vuln-type: 'library'
+          severity: 'HIGH,CRITICAL' # Risk Threshold: Blocks on severe threats, ignoring low-risk noise
+
+  repo-governance:
+    name: "Gate 3: OpenSSF Scorecard Supply Chain Assessment"
+    runs-on: ubuntu-latest
+    needs: dependency-audit
+    permissions:
+      security-events: write # Required to publish metrics to GitHub Security tab
+      id-token: write
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: "Analyze Repo Posture"
+        uses: ossf/scorecard-action@v2.4.0
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true # Logs metrics directly to GitHub dependency graph ecosystem
